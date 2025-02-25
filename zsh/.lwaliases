@@ -1,0 +1,4 @@
+function tx() {
+     tmux -u new-session -A -s main "$@"
+}
+alias tx="tx"
