@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+/config/.config/tigervnc/
+/config/.config/gh/
+/config/.config/iterm2/
+/config/.config/karabiner/
