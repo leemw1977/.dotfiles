@@ -43,21 +43,10 @@ alias loc="npx sloc --format cli-table --format-option head --exclude 'build|\.s
 # load zsh-completions
 autoload -U compinit && compinit
 
+# use nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# Using Rye for python and env management
-source "$HOME/.rye/env"
-
 # use starship theme (needs to be at the end)
 eval "$(starship init zsh)"
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=(/Users/leewilliams/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
-
-
-source ~/.lwaliases
-source ~/.lwsetup
