@@ -1,5 +1,6 @@
 # Prerequisites
 *.d
+!.emacs.d/
 
 # Object files
 *.o
