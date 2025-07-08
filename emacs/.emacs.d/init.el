@@ -54,6 +54,24 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+
+
+;; -----------------------------------
+;; Configuration and local overrides
+;; -----------------------------------
+;; Set default them
+;; Load machine-specific config if it exists
+(let ((machine-specific (expand-file-name "my-machine.el" user-emacs-directory)))
+  (when (file-exists-p machine-specific)
+    (load machine-specific)
+    (message "my-machine.el loaded from %s" user-emacs-directory)))
+
+;; Load  optional local override file if it exists
+(let ((local-config (expand-file-name "local.el" user-emacs-directory)))
+  (when (file-exists-p local-config)
+    (load-file local-config)
+    (message "local.el load from %s" user-emacs-directory)))
+
 ;; -------------------------------
 ;; Theme and Font
 ;; -------------------------------
@@ -65,7 +83,7 @@
 ;; Set default font
 (set-face-attribute 'default nil
                     :family "JetBrainsMono NF"
-                    :height 140)  ;; Adjust as needed
+                    :height my/default-font-size)  ;; Adjust as needed
 
 ;; Set fallback font for emoji
 (when (member "Segoe UI Emoji" (font-family-list))
@@ -183,10 +201,7 @@
          :empty-lines 1)
        ))
 
-;; Load optional local override file if it exists
-(let ((local-config (expand-file-name "local.el" user-emacs-directory)))
-  (when (file-exists-p local-config)
-    (load-file local-config)))
+
 
 ;; Load org-jira and set the basic URL
 (use-package org-jira
