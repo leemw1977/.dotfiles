@@ -1,4 +1,5 @@
 ;; -*- lexical-binding: t; -*-
+(add-to-list 'load-path "~/src/leemw1977/org-ticketflow")
 
 ;; -------------------------------
 ;; Emacs Init File - Clean & Modern
@@ -201,21 +202,29 @@
          :empty-lines 1)
        ))
 
-
-
-;; Load org-jira and set the basic URL
-(use-package org-jira
-  :after org
-  :init
-  (setq jiralib-url "https://topcashback.atlassian.net"
-        org-jira-todo-states
-        '(( "Backlog" . "BACKLOG")
-        ( "To Do" . "TODO")
-        ( "In Progress" .  "IN-PROGRESS")
-        ( "Blocked" . "BLOCKED")
-        ( "Done" . "DONE")
-        ( "Cancelled" . "NOT-ACCEPTED")))
+(use-package plz
   :ensure t)
+
+
+(use-package org-ticketflow
+  :load-path "~/src/leemw1977/org-ticketflow")
+
+
+
+;; ;; Load org-jira and set the basic URL
+;; (use-package org-jira
+;;   :load-path "~/src/leemw1977/org-jira"
+;;   :after org
+;;   :init
+;;   (setq jiralib-url "https://topcashback.atlassian.net"
+;;         org-jira-todo-states
+;;         '(( "Backlog" . "BACKLOG")
+;;         ( "To Do" . "TODO")
+;;         ( "In Progress" .  "IN-PROGRESS")
+;;         ( "Blocked" . "BLOCKED")
+;;         ( "Done" . "DONE")
+;;         ( "Cancelled" . "NOT-ACCEPTED")))
+;;   :ensure t)
 
 
 ;; (setq org-jira-custom-jqls
@@ -241,7 +250,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(ligature org-jira org-modern org-superstar plz solarized-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -250,8 +260,8 @@
  )
 
 
-(add-to-list 'load-path "~/.emacs.d/org-jira-extensions")
-(require 'org-jira-extensions)
+;; (add-to-list 'load-path "~/.emacs.d/org-jira-extensions")
+;; (require 'org-jira-extensions)
 
 
 (defun clear-messages-buffer ()

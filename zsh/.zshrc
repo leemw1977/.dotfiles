@@ -43,6 +43,9 @@ alias loc="npx sloc --format cli-table --format-option head --exclude 'build|\.s
 # load zsh-completions
 autoload -U compinit && compinit
 
+# Add .NET Core SDK tools
+export PATH="$PATH:~/.dotnet/tools"
+
 # use nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
