@@ -1,6 +1,19 @@
+;; -*- lexical-binding: t; -*-
+(add-to-list 'load-path "~/src/leemw1977/org-ticketflow")
+
 ;; -------------------------------
 ;; Emacs Init File - Clean & Modern
 ;; -------------------------------
+
+(global-set-key (kbd "C-c r")
+                (lambda () (interactive)
+                  (load-file user-init-file)
+                  (message "🔄 Reloaded init.el")))
+
+;; Set auth sources
+(setq auth-sources '("~/.authinfo.gpg"))
+
+
 
 ;; setup # insert for mac emacs
 (global-set-key (kbd "C-c <f2>") (lambda () (interactive) (insert "#")))
@@ -42,6 +55,24 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
+
+
+;; -----------------------------------
+;; Configuration and local overrides
+;; -----------------------------------
+;; Set default them
+;; Load machine-specific config if it exists
+(let ((machine-specific (expand-file-name "my-machine.el" user-emacs-directory)))
+  (when (file-exists-p machine-specific)
+    (load machine-specific)
+    (message "my-machine.el loaded from %s" user-emacs-directory)))
+
+;; Load  optional local override file if it exists
+(let ((local-config (expand-file-name "local.el" user-emacs-directory)))
+  (when (file-exists-p local-config)
+    (load-file local-config)
+    (message "local.el load from %s" user-emacs-directory)))
+
 ;; -------------------------------
 ;; Theme and Font
 ;; -------------------------------
@@ -53,7 +84,7 @@
 ;; Set default font
 (set-face-attribute 'default nil
                     :family "JetBrainsMono NF"
-                    :height 140)  ;; Adjust as needed
+                    :height my/default-font-size)  ;; Adjust as needed
 
 ;; Set fallback font for emoji
 (when (member "Segoe UI Emoji" (font-family-list))
@@ -71,58 +102,13 @@
                                 ">>" "<<" "..." "?:" "::"))
   (global-ligature-mode t))
 
-;; -------------------------------
-;; Todo Sequence using emojis
-;; -------------------------------
-;;(setq org-todo-keywords
-;;      '((sequence "BACKLOG(l!)" "TODO(t!)" "IN-PROGRESS(i!)" "BLOCKED(b@)" "|" "DONE(d!)" "NOT-ACCEPTED(n!)")))
 
-;;(setq org-todo-keyword-faces
-;;      '(("BACKLOG" . (:foreground "orange" :weight bold))
-;;	("TODO" . (:foreground "orange" :weight bold))
-;;        ("IN-PROGRESS" . (:foreground "yellow" :weight bold))
-;;        ("BLOCKED" . (:foreground "light blue" :weight bold))
-;;        ("DONE" . (:foreground "green" :weight bold))
-;;        ("NOT-ACCEPTED" . (:foreground "gray" :weight bold :strike-through t))))
-
-;;(defun my/org-add-emoji-for-todo ()
-;;  "Add or update emoji at the start of a heading based on the TODO keyword."
-;;  (when (org-get-todo-state)
-;;    (let* ((emoji-map '(("BACKLOG" . "❓")
-;;			("TODO" . "🔧")
-;;                        ("IN-PROGRESS" . "⏳")
-;;                        ("BLOCKED" . "💤")
-;;                        ("DONE" . "✔️")
-;;                        ("NOT-ACCEPTED" . "❌")))
-;;           (todo (org-get-todo-state))e
-;;           (emoji (cdr (assoc todo emoji-map))))
-;;      (when emoji
-;;        (save-excursion
-;;          (org-back-to-heading t)
-;;          ;; Remove any existing emoji at start of heading text
-;;          (when (looking-at "^\\*+ +\\S-+ +\\([[:nonascii:][:punct:][:symbol:]]+\\) ")
-;;            (replace-match ""))
-;;          ;; Insert the correct emoji
-;;          (re-search-forward (regexp-quote todo))
-;;          (insert " " emoji))))))
-
-;;;; Hook it into Org whenever you change TODO state
-;;(add-hook 'org-after-todo-state-change-hook #'my/org-add-emoji-for-todo)
-
-;;(setq org-log-done 'time)
-;;;; Enable persistent time tracking in Org
-;;(setq org-clock-persist 'history)              ; Save clock history on exit
-;;(org-clock-persistence-insinuate)              ; Restore clock data on startup
-;;(setq org-clock-in-resume t)                   ; Resume clocking on same task
-;;(setq org-clock-out-remove-zero-time-clocks t) ; Clean up 0:00 entries
-;;(setq org-clock-report-include-clocking-task t); Show active task in reports
 
 ;; -------------------------------------
 ;; 1. Define custom TODO keywords
 ;; -------------------------------------
 (setq org-todo-keywords
-      '((sequence "BACKLOG(l!)" "TODO(t!)" "IN-PROGRESS(i!)" "BLOCKED(b@)"
-                  "|" "DONE(d!)" "NOT-ACCEPTED(n!)")))
+      '((sequence "BACKLOG" "TODO(t)" "IN-PROGRESS(i)" "BLOCKED(b)" "|" "DONE(d)" "NOT-ACCEPTED(c)")))
 
 ;; -------------------------------------
 ;; 2. Colour-code TODO keywords
@@ -152,23 +138,6 @@
 ;; -------------------------------------
 ;; 5. Enable org-superstar/org-modern (visual polish)
 ;; -------------------------------------
-;;(use-package org-superstar
-;;  :ensure t
-;;  :hook (org-mode . org-superstar-mode)
-;;  :config
-;;  (setq org-superstar-headline-bullets-list '("◉" "○" "•" "▪" "▸"))
-;;  (setq org-superstar-item-bullet-alist '((?- . ?•) (?+ . ?➤) (?* . ?✦)))
-;;  (setq org-superstar-remove-leading-stars t)
-;;  (setq org-hide-leading-stars nil)) ;; Leave this as nil so it works well with your coloured TODOs
-
-
-;;(use-package org-modern
-;;  :ensure t
-;;  :hook (org-mode . org-modern-mode)
-;;  :config
-;;  (setq org-modern-todo-faces nil ; So it doesn’t override your custom colours
-;;        org-modern-star '("◉" "○" "✿" "•")
-;;        org-modern-checkbox '((?X . "✔") (?- . "–") (?\s . "☐")))) ; Pretty checkboxes
 
 (use-package org-modern
   :ensure t
@@ -222,7 +191,7 @@
 
         ;; 📞 Meeting Notes
         ("m" "Meeting or Call Notes"
-         entry (file+datetree "~/Google Drive/My Drive/orgj/security/meetings.org")
+         entry (file+datetree "~/Google Drive/My Drive/org/security/meetings.org")
          "* %U - %^{Title of discussion}\n:PROPERTIES:\n:Participants: %^{Who was present?}\n:Created: %U\n:END:\n\n%?"
          :empty-lines 1)
         
@@ -233,53 +202,45 @@
          :empty-lines 1)
        ))
 
-;; Load optional local override file if it exists
-(let ((local-config (expand-file-name "local.el" user-emacs-directory)))
-  (when (file-exists-p local-config)
-    (load-file local-config)))
-
-;; Load org-jira and set the basic URL
-(use-package org-jira
-  :ensure t
-  :config
-  (setq jiralib-url "https://topcashback.atlassian.net"))
+(use-package plz
+  :ensure t)
 
 
-(setq org-jira-custom-jqls
-  '(
-    (:jql " project = INFSEC AND issuetype NOT IN (Epic) AND status NOT IN (Done, 'Not Accepted') ORDER BY created DESC"
-          :filename "exported-from-jira-isec")
-    ))
+(use-package org-ticketflow
+  :load-path "~/src/leemw1977/org-ticketflow")
 
-;; Define a reusable query for Jira
-(defun my/org-jira-get-isec-base-issues ()
-  (interactive)
-  (org-jira-get-issues-from-custom-jql
-   "project = INFSEC AND issuetype NOT IN (Epic) AND status NOT IN (Done, 'Not Accepted') ORDER BY created DESC"))
 
-;; Create functions to only update and create items in jira that have the jira tag
-(defun my/org-jira-update-tagged ()
-  "Update only :jira:-tagged items in current buffer."
-  (interactive)
-  (org-map-entries #'org-jira-update-issue "+jira"))
 
-(global-set-key (kbd "C-c j u") 'my/org-jira-update-tagged)
+;; ;; Load org-jira and set the basic URL
+;; (use-package org-jira
+;;   :load-path "~/src/leemw1977/org-jira"
+;;   :after org
+;;   :init
+;;   (setq jiralib-url "https://topcashback.atlassian.net"
+;;         org-jira-todo-states
+;;         '(( "Backlog" . "BACKLOG")
+;;         ( "To Do" . "TODO")
+;;         ( "In Progress" .  "IN-PROGRESS")
+;;         ( "Blocked" . "BLOCKED")
+;;         ( "Done" . "DONE")
+;;         ( "Cancelled" . "NOT-ACCEPTED")))
+;;   :ensure t)
 
-(defun my/org-jira-create-tagged ()
-  "Create only :jira:-tagged items in current buffer."
-  (interactive)
-  (org-map-entries #'org-jira-create-issue "+jira"))
 
-(global-set-key (kbd "C-c j u") 'my/org-jira-create-tagged)
+;; (setq org-jira-custom-jqls
+;;   '(
+;;     (:jql " project = INFSEC AND issuetype NOT IN (Epic) AND status NOT IN (Done, 'Not Accepted') ORDER BY created DESC"
+;;           :filename "exported-from-jira-isec")
+;;     ))
 
-(setq org-jira-todo-states
-      '(( "Backlog" . "BACKLOG")
-        ( "To Do" . "TODO")
-        ( "In Progress" . "IN-PROGRESS")
-        ( "Blocked" . "BLOCKED")
-        ( "Done" . "DONE")
-        ( "Cancelled" . "NOT-ACCEPTED")))
 
+;; (setq org-jira-todo-states
+;;       '(( "Backlog" . "BACKLOG")
+;;         ( "To Do" . "TODO")
+;;         ( "In Progress" .  "IN-PROGRESS")
+;;         ( "Blocked" . "BLOCKED")
+;;         ( "Done" . "DONE")
+;;         ( "Cancelled" . "NOT-ACCEPTED")))
 
 ;; -------------------------------
 ;; Package Selections (for Custom)
@@ -289,10 +250,26 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages nil))
+ '(package-selected-packages
+   '(ligature org-jira org-modern org-superstar plz solarized-theme)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+
+;; (add-to-list 'load-path "~/.emacs.d/org-jira-extensions")
+;; (require 'org-jira-extensions)
+
+
+(defun clear-messages-buffer ()
+  "Forcefully erase the *Messages* buffer."
+  (interactive)
+  (let ((messages-buffer (get-buffer "*Messages*")))
+    (when messages-buffer
+      (with-current-buffer messages-buffer
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (message "✅ Cleared *Messages* buffer."))))))
