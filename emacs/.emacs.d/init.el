@@ -179,32 +179,28 @@
       `(
         ;; 🚧 Roadmap Task
         ("r" "Roadmap Task"
-         entry (file+headline "~/Google Drive/My Drive/org/security/roadmap.org" "Roadmap Tasks")
-         "* BACKLOG %^{Task Title}\n  :PROPERTIES:\n  :Created: %U\n  :Category: Roadmap\n  :JIRA_PROJECT: INFSEC\n  :JIRA_ISSUE_TYPE: Story\n    :END:\n%?"
+         entry (file+headline ,(expand-file-name "roadmap.org" my/org-root-path) "Roadmap Tasks")
+         "* BACKLOG %^{Task Title}\n  :PROPERTIES:\n  :Created: %U\n  :Category: Roadmap\n  :JIRA_PROJECT: INFSEC\n  :JIRA_ISSUE_TYPE: Story\n  :END:\n%?"
          :empty-lines 1)
 
         ;; 📥 Quick Inbox Task
         ("t" "Quick Task to Inbox"
-         entry (file+headline "~/Google Drive/My Drive/org/security/inbox.org" "Tasks")
+         entry (file+headline ,(expand-file-name "inbox.org" my/org-root-path) "Tasks")
          "* TODO %^{Task Title} %^g\n  :PROPERTIES:\n  :Created: %U\n  :Source: %^{Source|email|chat|meeting|call|ad-hoc}\n  :END:\n%?"
          :empty-lines 1)
 
         ;; 📞 Meeting Notes
         ("m" "Meeting or Call Notes"
-         entry (file+datetree "~/Google Drive/My Drive/org/security/meetings.org")
+         entry (file+datetree ,(expand-file-name "meetings.org" my/org-root-path))
          "* %U - %^{Title of discussion}\n:PROPERTIES:\n:Participants: %^{Who was present?}\n:Created: %U\n:END:\n\n%?"
          :empty-lines 1)
-        
 
-	("p" "Personal Task" entry
-         (file+headline "~/org/tasks.org" "Inbox")
+        ;; 🏠 Personal Task (unchanged path, adjust if desired)
+        ("p" "Personal Task"
+         entry (file+headline "~/org/tasks.org" "Inbox")
          "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:\n  :PERSONAL:\n"
          :empty-lines 1)
-       ))
-
-(use-package plz
-  :ensure t)
-
+        ))
 
 (use-package org-ticketflow
   :load-path "~/src/leemw1977/org-ticketflow")
