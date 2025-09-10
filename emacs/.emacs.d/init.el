@@ -1,5 +1,5 @@
 ;; -*- lexical-binding: t; -*-
-(add-to-list 'load-path "~/src/leemw1977/org-ticketflow")
+;; (add-to-list 'load-path "~/src/leemw1977/org-ticketflow")
 
 ;; -------------------------------
 ;; Emacs Init File - Clean & Modern
