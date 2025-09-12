@@ -44,7 +44,9 @@ alias loc="npx sloc --format cli-table --format-option head --exclude 'build|\.s
 autoload -U compinit && compinit
 
 # Add .NET Core SDK tools
-export PATH="$PATH:~/.dotnet/tools"
+if [[ ":$PATH:" != *":$HOME/.dotnet/tools:"* ]]; then
+  export PATH="$HOME/.dotnet/tools:$PATH"
+fi
 
 # use nvm
 export NVM_DIR="$HOME/.nvm"
@@ -53,3 +55,23 @@ export NVM_DIR="$HOME/.nvm"
 
 # use starship theme (needs to be at the end)
 eval "$(starship init zsh)"
+
+# Created by `pipx`
+case "$OSTYPE" in
+  darwin*) # macOS
+    export PATH="$PATH:/Users/leewilliams/.local/bin"
+    ;;
+  linux-gnu*) # Linux
+    export PATH="$PATH:/home/leewilliams/.local/bin"
+    ;;
+  msys*|cygwin*|win32) # Windows / Git Bash
+    export PATH="$PATH:/c:/Users/leewilliams/.local/bin"
+    ;;
+  *)
+    echo "Warning: Unknown OS type '$OSTYPE' – pipx path not set"
+    ;;
+esac
+
+
+# Setup SSH auth sock
+export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
