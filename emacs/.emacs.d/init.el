@@ -203,9 +203,7 @@
         ))
 
 ;; (use-package org-ticketflow
-;;   :load-path "~/src/leemw1977/org-ticketflow")
-
-
+;;  :load-path "~/src/leemw1977/org-ticketflow")
 
 ;; ;; Load org-jira and set the basic URL
 ;; (use-package org-jira
