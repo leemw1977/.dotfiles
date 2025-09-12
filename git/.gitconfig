@@ -1,0 +1,18 @@
+[user]
+  name = Lee Williams
+  email = leemw1977@outlook.com
+  signingkey = 5BEA 3E8E 3EF5 7E94 407D  5427 BF51 5FB7 6413 06C5
+
+[commit]
+  gpgsign = true
+
+[gpg]
+  format = gpg
+  program = gpg
+
+[core]
+  sshCommand = ssh
+  editor = emacs
+
+[push]
+  default = simple

@@ -205,8 +205,6 @@
 ;; (use-package org-ticketflow
 ;;  :load-path "~/src/leemw1977/org-ticketflow")
 
-
-
 ;; ;; Load org-jira and set the basic URL
 ;; (use-package org-jira
 ;;   :load-path "~/src/leemw1977/org-jira"
@@ -259,6 +257,119 @@
 ;; (add-to-list 'load-path "~/.emacs.d/org-jira-extensions")
 ;; (require 'org-jira-extensions)
 
+
+;; -------------------------------
+;; Jira Link Insertion
+;; -------------------------------
+;;;; --- Jira links + optional target labels ---  (paste into init.el)
+
+(defgroup lw/jira-link nil
+  "Insert and follow Org links to Jira tickets, with optional Org targets."
+  :group 'org)
+
+(defcustom lw/jira-base-url "https://topcashback.atlassian.net"
+  "Base URL of your Jira instance, no trailing slash."
+  :type 'string
+  :group 'lw/jira-link)
+
+(defcustom lw/jira-insert-target-default 'always
+  "Whether to add a dedicated Org target (<<KEY>>) after inserting the link.
+Possible values:
+- 'never  : never add
+- 'ask    : prompt each time
+- 'always : always add
+A universal prefix arg (C-u) to `lw/jira-insert-link` forces adding the target."
+  :type '(choice (const :tag "Never" never)
+                 (const :tag "Ask" ask)
+                 (const :tag "Always" always))
+  :group 'lw/jira-link)
+
+(defcustom lw/jira-target-placement 'after-link
+  "Where to place the target when added.
+- 'after-link : immediately after the inserted link (with a space)
+- 'eol        : at end of the current line (prepend a space if needed)
+- 'eob        : at end of buffer on a new line"
+  :type '(choice (const after-link) (const eol) (const eob))
+  :group 'lw/jira-link)
+
+(defcustom lw/jira-target-transform #'upcase
+  "Function applied to the Jira key before building the target text.
+Use `identity` if you don’t want to change case."
+  :type 'function
+  :group 'lw/jira-link)
+
+(defun lw/jira--issue-url (key)
+  "Return the full HTTPS URL for Jira issue KEY."
+  (unless (and (stringp lw/jira-base-url)
+               (string-match-p "^https?://" lw/jira-base-url))
+    (user-error "Set lw/jira-base-url to your Jira site first"))
+  (format "%s/browse/%s" lw/jira-base-url key))
+
+(with-eval-after-load 'org
+  (org-link-set-parameters
+   "jira"
+   :follow (lambda (key) (browse-url (lw/jira--issue-url key)))
+   :export (lambda (key desc backend)
+             (let* ((url (lw/jira--issue-url key))
+                    (label (or desc key)))
+               (pcase backend
+                 ((or 'html 'hugo 'ox-hugo) (format "<a href=\"%s\">%s</a>" url label))
+                 ('md                        (format "[%s](%s)" label url))
+                 (_                          (format "%s (%s)" label url)))))))
+
+(defun lw/jira-infer-key-at-point ()
+  "Best-effort guess of a Jira issue key at point (e.g., ABC-123)."
+  (let ((case-fold-case nil))
+    (save-excursion
+      (let ((sym (thing-at-point 'symbol t)))
+        (when (and sym (string-match-p "^[A-Z][A-Z0-9]+-[0-9]+$" sym))
+          sym)))))
+
+(defun lw/jira--maybe-insert-target (key forced)
+  "Insert a dedicated target based on KEY according to user prefs.
+If FORCED is non-nil, insert regardless of `lw/jira-insert-target-default`."
+  (let* ((decision (cond
+                    (forced 'always)
+                    (t lw/jira-insert-target-default)))
+         (do-it (pcase decision
+                  ('never  nil)
+                  ('always t)
+                  ('ask    (y-or-n-p (format "Also insert target <<%s>>? "
+                                             (funcall lw/jira-target-transform key))))
+                  (_ nil))))
+    (when do-it
+      (let ((target (format "<<%s>>" (funcall lw/jira-target-transform key))))
+        (pcase lw/jira-target-placement
+          ('after-link (insert " " target))
+          ('eol        (save-excursion
+                         (end-of-line)
+                         (unless (bolp) (insert " "))
+                         (insert target)))
+          ('eob        (save-excursion
+                         (goto-char (point-max))
+                         (unless (bolp) (insert "\n"))
+                         (insert target))))
+        t))))
+
+;;;###autoload
+(defun lw/jira-insert-link (&optional key)
+  "Insert an Org link to a Jira issue, and optionally append a target <<KEY>>.
+With a universal prefix argument (C-u), force adding the target regardless of
+`lw/jira-insert-target-default`."
+  (interactive)
+  (let* ((forced (and current-prefix-arg t))
+         (default-key (lw/jira-infer-key-at-point))
+         (key (or key (read-string (if default-key
+                                       (format "Jira issue key (default %s): " default-key)
+                                     "Jira issue key: ")
+                                   nil nil default-key)))
+         (desc (read-string "Description (blank = use key): " nil nil key)))
+    (insert (format "[[jira:%s][%s]]" key (if (string-empty-p desc) key desc)))
+    (lw/jira--maybe-insert-target key forced)))
+
+;; Optional: bind in Org buffers
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c j") #'lw/jira-insert-link))
 
 (defun clear-messages-buffer ()
   "Forcefully erase the *Messages* buffer."
