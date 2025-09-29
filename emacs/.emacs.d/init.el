@@ -122,18 +122,18 @@
         ("NOT-ACCEPTED" . (:foreground "gray" :weight bold :strike-through t))))
 
 ;; -------------------------------------
-;; 3. Log timestamps when closing tasks
-;; -------------------------------------
-(setq org-log-done 'time)
-
-;; -------------------------------------
-;; 4. Optional: persistent time tracking
+;; 3 and 4. Time Tracking settings
 ;; -------------------------------------
 (setq org-clock-persist 'history)
 (org-clock-persistence-insinuate)
 (setq org-clock-in-resume t)
 (setq org-clock-out-remove-zero-time-clocks t)
 (setq org-clock-report-include-clocking-task t)
+(setq org-log-done 'time)                                        ;; Log timestamp when DONE
+(setq org-log-into-drawer t)                                     ;; Keep logs tidy inside :LOGBOOK:
+(setq org-clock-auto-clock-resolution 'when-no-clock-is-running) ;; Auto resolve overlapping clocks
+(setq org-clock-in-switch-to-state "IN-PROGRESS")                ;; Auto change state when clocking in
+(setq org-clock-out-when-done t)                                 ;; Auto clock out when task marked DONE
 
 ;; -------------------------------------
 ;; 5. Enable org-superstar/org-modern (visual polish)
