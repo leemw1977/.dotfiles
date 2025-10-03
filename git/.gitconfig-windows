@@ -1,0 +1,24 @@
+[credential "https://git.tcb.zone"]
+	provider = generic
+[credential]
+	helper = manager-core
+[gpg]
+	program = C:\\\\Program Files (x86)\\\\GnuPG\\\\bin\\\\gpg.exe
+[init]
+  defaultBranch = main
+[user]
+	signingkey = 159FB708482E016A
+
+[includeIf "gitdir/i:C:/Git/"]
+    path = ~/.gitconfig-work
+
+[includeIf "gitdir:~/src/"]
+    path = ~/.gitconfig-personal
+
+[commit]
+  gpgsign = true
+[core]
+	sshCommand = plink.exe -batch
+  editor = "code --wait"
+[push]
+  default = simple

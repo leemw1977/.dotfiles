@@ -1,9 +1,12 @@
 [init]
   defaultBranch = main
 [user]
-  name = Lee Williams
-  email = leemw1977@outlook.com
-  signingkey = 5BEA3E8E3EF57E94407D5427BF515FB7641306C5
+  signingkey = 159FB708482E016A
+[includeIf "gitdir:/Git/"]
+    path = ~/.gitconfig-work
+
+[includeIf "gitdir:~/src/"]
+    path = ~/.gitconfig-personal
 
 [commit]
   gpgsign = true
