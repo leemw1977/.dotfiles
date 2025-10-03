@@ -22,6 +22,9 @@
 ;; Maximise window on start
 (push '(fullscreen . maximized) default-frame-alist)
 
+;; Set backup to a centralised place
+(setq backup-directory-alist '(("." . "~/MyEmacsBackups")))
+
 
 ;; Ensure org agenda is available and configured
 (require 'org)
