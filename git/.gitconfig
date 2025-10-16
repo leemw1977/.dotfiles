@@ -2,7 +2,7 @@
   defaultBranch = main
 [user]
   signingkey = 159FB708482E016A
-[includeIf "gitdir:/Git/"]
+[includeIf "gitdir:Git/"]
     path = ~/.gitconfig-work
 
 [includeIf "gitdir:~/src/"]
