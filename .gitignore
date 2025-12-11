@@ -64,3 +64,4 @@ emacs/.emacs.d/elpa/
 emacs/.emacs.d/request/
 emacs/.emacs.d/url/
 my-machine.el*
+emacs/.emacs.d/init.elc
