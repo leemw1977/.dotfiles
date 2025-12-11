@@ -9,7 +9,7 @@
 [user]
 	signingkey = 159FB708482E016A
 
-[includeIf "gitdir/i:C:/Git/"]
+[includeIf "gitdir/i:Git/"]
     path = ~/.gitconfig-work
 
 [includeIf "gitdir:~/src/"]
@@ -18,7 +18,7 @@
 [commit]
   gpgsign = true
 [core]
-	sshCommand = plink.exe -batch
+	sshCommand = ssh
   editor = "code --wait"
 [push]
   default = simple
