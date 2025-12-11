@@ -13,8 +13,6 @@
 ;; Set auth sources
 (setq auth-sources '("~/.authinfo.gpg"))
 
-
-
 ;; setup # insert for mac emacs
 (global-set-key (kbd "C-c <f2>") (lambda () (interactive) (insert "#")))
 
@@ -24,6 +22,19 @@
 
 ;; Set backup to a centralised place
 (setq backup-directory-alist '(("." . "~/MyEmacsBackups")))
+
+;; You can set any of these in ~/.emacs.d/my-machine.el to override the default.
+;; Initialise variables that can be overridden.
+(defvar my/default-font-size 150
+  "Default font size. Override this in host- or context-specific configs.")
+
+(defvar my/org-root-path
+  "/mnt/g/My Drive/org/security"
+  "Root directory for Org files and Jira data on this machine.")
+
+
+(defvar my/tempfile-path (expand-file-name "MyEmacsTempFiles/" temporary-file-directory)
+  "Base directory for Emacs temporary, backup, and autosave files.")
 
 
 ;; Ensure org agenda is available and configured
@@ -58,23 +69,38 @@
 (require 'use-package)
 (setq use-package-always-ensure t)
 
-
-
 ;; -----------------------------------
 ;; Configuration and local overrides
 ;; -----------------------------------
-;; Set default them
 ;; Load machine-specific config if it exists
 (let ((machine-specific (expand-file-name "my-machine.el" user-emacs-directory)))
   (when (file-exists-p machine-specific)
     (load machine-specific)
     (message "my-machine.el loaded from %s" user-emacs-directory)))
 
-;; Load  optional local override file if it exists
-(let ((local-config (expand-file-name "local.el" user-emacs-directory)))
-  (when (file-exists-p local-config)
-    (load-file local-config)
-    (message "local.el load from %s" user-emacs-directory)))
+;; Set agenda and org-jira directories
+(setq org-agenda-files (list my/org-root-path))
+(setq org-jira-working-dir my/org-root-path)
+
+;; Optional: define work layout using root path
+(defun my-work-layout ()
+  "Open key Org files in a three-pane layout."
+  (interactive)
+  (delete-other-windows)
+  (let ((file-a (expand-file-name "INFSEC.org" my/org-root-path))
+        (file-b (expand-file-name "journal.org" my/org-root-path))
+        (file-c (expand-file-name "meetings.org" my/org-root-path)))
+    (find-file file-a)
+    (let ((right (split-window-right)))
+      (select-window right)
+      (find-file file-b))))
+;;      (let ((bottom (split-window-below)))
+;;        (select-window bottom)
+;;        (find-file file-c)))))
+
+;; Optional: bind layout to F9
+(global-set-key (kbd "<f9>") #'my-work-layout)
+
 
 ;; -------------------------------
 ;; Theme and Font
@@ -198,48 +224,21 @@
          "* %U - %^{Title of discussion}\n:PROPERTIES:\n:Participants: %^{Who was present?}\n:Created: %U\n:END:\n\n%?"
          :empty-lines 1)
 
-        ;; 🏠 Personal Task (unchanged path, adjust if desired)
-        ("p" "Personal Task"
-         entry (file+headline "~/org/tasks.org" "Inbox")
-         "* TODO %?\n  :PROPERTIES:\n  :CREATED: %U\n  :END:\n  :PERSONAL:\n"
+        ;; 📝 Daily Note
+        ("d" "Daily Note"
+         entry (file+olp+datetree ,(expand-file-name "journal.org" my/org-root-path))
+         "* %<%Y-%m-%d> :daily:\n** Focus\n- \n** Tasks\n- \n** Notes\n- \n"
          :empty-lines 1)
-        ))
 
-;; (use-package org-ticketflow
-;;  :load-path "~/src/leemw1977/org-ticketflow")
-
-;; ;; Load org-jira and set the basic URL
-;; (use-package org-jira
-;;   :load-path "~/src/leemw1977/org-jira"
-;;   :after org
-;;   :init
-;;   (setq jiralib-url "https://topcashback.atlassian.net"
-;;         org-jira-todo-states
-;;         '(( "Backlog" . "BACKLOG")
-;;         ( "To Do" . "TODO")
-;;         ( "In Progress" .  "IN-PROGRESS")
-;;         ( "Blocked" . "BLOCKED")
-;;         ( "Done" . "DONE")
-;;         ( "Cancelled" . "NOT-ACCEPTED")))
-;;   :ensure t)
+        ;; 📅 Weekly Plan
+        ("w" "Weekly Plan"
+         entry (file ,(expand-file-name "journal.org" my/org-root-path))
+         "* Week %<%Y-W%V> :weekly:\n** Goals\n- \n\n** Key Deliverables\n\n- \n\n** Notes\n- \n"
+         :empty-lines 1)
+      ))
 
 
-;; (setq org-jira-custom-jqls
-;;   '(
-;;     (:jql " project = INFSEC AND issuetype NOT IN (Epic) AND status NOT IN (Done, 'Not Accepted') ORDER BY created DESC"
-;;           :filename "exported-from-jira-isec")
-;;     ))
-
-
-;; (setq org-jira-todo-states
-;;       '(( "Backlog" . "BACKLOG")
-;;         ( "To Do" . "TODO")
-;;         ( "In Progress" .  "IN-PROGRESS")
-;;         ( "Blocked" . "BLOCKED")
-;;         ( "Done" . "DONE")
-;;         ( "Cancelled" . "NOT-ACCEPTED")))
-
-;; -------------------------------
+;; -------------------------------n
 ;; Package Selections (for Custom)
 ;; -------------------------------
 (custom-set-variables
@@ -255,11 +254,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
-
-;; (add-to-list 'load-path "~/.emacs.d/org-jira-extensions")
-;; (require 'org-jira-extensions)
-
 
 ;; -------------------------------
 ;; Jira Link Insertion
@@ -383,3 +377,53 @@ With a universal prefix argument (C-u), force adding the target regardless of
         (let ((inhibit-read-only t))
           (erase-buffer)
           (message "✅ Cleared *Messages* buffer."))))))
+
+
+;; ------------------------------------------------------------
+;; Centralised Temporary, Backup, and Autosave File Management
+;; ------------------------------------------------------------
+
+;; Ensure base and subdirectories exist
+(dolist (subdir '("backups" "auto-saves"))
+  (make-directory (expand-file-name subdir my/tempfile-path) t))
+
+;; Core settings
+(setq backup-directory-alist
+      `(("." . ,(expand-file-name "backups/" my/tempfile-path)))
+      auto-save-file-name-transforms
+      `((".*" ,(expand-file-name "auto-saves/" my/tempfile-path) t))
+      auto-save-list-file-prefix
+      (expand-file-name "auto-saves/.saves-" my/tempfile-path)
+      create-lockfiles t) ;; Keep lockfiles in place for safety
+
+;; ------------------------------------------------------------
+;; Automatic Cleanup (backups, autosaves, and old lockfiles)
+;; ------------------------------------------------------------
+
+(defun my/cleanup-old-tempfiles (&optional days)
+  "Delete backup, autosave, and lock files older than DAYS.
+Defaults to 30 days."
+  (interactive "P")
+  (let* ((days (or days 30))
+         (tempdirs (list
+                    (expand-file-name "backups/" my/tempfile-path)
+                    (expand-file-name "auto-saves/" my/tempfile-path)))
+         (age (* 24 3600 days)))
+    (message "Cleaning up Emacs temp files older than %d days..." days)
+    ;; Clean backups and autosaves
+    (dolist (dir tempdirs)
+      (when (file-directory-p dir)
+        (dolist (file (directory-files dir t "^[^.]"))
+          (when (and (file-regular-p file)
+                     (> (- (float-time) (float-time (nth 5 (file-attributes file))))
+                        age))
+            (delete-file file)
+            (message "Deleted old tempfile: %s" file)))))
+    ;; Clean lockfiles across home directory
+    (shell-command
+     (format "find %s -type f -name '.#*' -mtime +%d -delete"
+             (expand-file-name "~") days))
+    (message "Emacs temporary file cleanup complete.")))
+
+;; Run cleanup automatically once per startup
+(add-hook 'emacs-startup-hook #'my/cleanup-old-tempfiles)
