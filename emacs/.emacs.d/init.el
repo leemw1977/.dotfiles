@@ -82,26 +82,6 @@
 (setq org-agenda-files (list my/org-root-path))
 (setq org-jira-working-dir my/org-root-path)
 
-;; Optional: define work layout using root path
-(defun my-work-layout ()
-  "Open key Org files in a three-pane layout."
-  (interactive)
-  (delete-other-windows)
-  (let ((file-a (expand-file-name "INFSEC.org" my/org-root-path))
-        (file-b (expand-file-name "journal.org" my/org-root-path))
-        (file-c (expand-file-name "meetings.org" my/org-root-path)))
-    (find-file file-a)
-    (let ((right (split-window-right)))
-      (select-window right)
-      (find-file file-b))))
-;;      (let ((bottom (split-window-below)))
-;;        (select-window bottom)
-;;        (find-file file-c)))))
-
-;; Optional: bind layout to F9
-(global-set-key (kbd "<f9>") #'my-work-layout)
-
-
 ;; -------------------------------
 ;; Theme and Font
 ;; -------------------------------
