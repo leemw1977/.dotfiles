@@ -75,3 +75,5 @@ esac
 
 # Setup SSH auth sock
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
+export DOTNET_ROOT="/opt/homebrew/opt/dotnet/libexec"
