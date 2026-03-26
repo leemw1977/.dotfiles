@@ -65,3 +65,10 @@ emacs/.emacs.d/request/
 emacs/.emacs.d/url/
 my-machine.el*
 emacs/.emacs.d/init.elc
+recentf
+places
+bookmarks*
+org-persist
+.org-id-locations
+%backup%*
+org-clock-save.el
