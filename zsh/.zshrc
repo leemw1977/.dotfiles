@@ -75,3 +75,5 @@ esac
 
 # Setup SSH auth sock
 export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+
+alias gam="/home/leewilliams/bin/gam7/gam"
