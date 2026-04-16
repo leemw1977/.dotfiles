@@ -40,7 +40,7 @@
 (setq auto-save-default t)
 (setq create-lockfiles nil)
 
-;; Prefer y/n over yes/no
+;; Prefer y/n over yes/no10
 (fset 'yes-or-no-p 'y-or-n-p)
 
 ;; Use spaces by default
@@ -148,6 +148,16 @@
           (todo "NEXT")
           (todo "WAITING")))))
 
+
+;; Built-in effort estimates
+(setq org-global-properties
+      '(("Effort_ALL" . "0:10 0:15 0:30 1:00 2:00 3:00 4:00 8:00")))
+
+(setq org-columns-default-format
+      "%50ITEM(Task) %10TODO(Status) %10Effort(Estimate){:} %10CLOCKSUM(Time Spent)")
+
+(setq org-agenda-columns-add-appointments-to-effort-sum t)
+
 ;; Skip done tasks in agenda where sensible
 (setq org-agenda-skip-scheduled-if-done t)
 (setq org-agenda-skip-deadline-if-done t)
@@ -170,6 +180,7 @@
 (global-set-key (kbd "S-<f11>") #'org-clock-out)
 (global-set-key (kbd "C-<f11>") #'org-clock-goto)
 
+(global-set-key (kbd "<f10>") #'org-archive-subtree)
 ;; --------------------------------------------------
 ;; Auto-open dashboard on startup
 ;; --------------------------------------------------
